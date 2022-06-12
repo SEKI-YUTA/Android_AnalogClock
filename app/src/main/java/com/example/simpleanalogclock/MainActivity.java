@@ -3,6 +3,8 @@ package com.example.simpleanalogclock;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,26 +22,38 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AnalogClock;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.simpleanalogclock.Listeners.OnChangeSettingListener;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     AnalogClock my_analogClock;
     RelativeLayout root_layout;
+    MaterialToolbar toolbar;
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
+    Date prevBackPressed;
 
     SettingManager settingManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         my_analogClock = findViewById(R.id.my_analogClock);
         root_layout = findViewById(R.id.root_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
         SettingManager.setUpManager(this);
         settingManager = SettingManager.getInstance();
+
 
         SharedPreferences preferences = getApplicationContext().getSharedPreferences("Setting", 0);
         String colorCode = preferences.getString("bgColor", "#F1F1F1");
@@ -71,6 +85,21 @@ public class MainActivity extends AppCompatActivity {
 //        };
 //        my_analogClock.setBackground(bgDrawable);
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        Date now = new Date();
+        if(prevBackPressed != null) {
+            if((now.getTime() - prevBackPressed.getTime()) < 2000) {
+                super.onBackPressed();
+                return;
+            }
+        }
+        prevBackPressed = now;
+        Toast.makeText(this, "アプリを終了するには素早く二回押してください", Toast.LENGTH_SHORT).show();
     }
 
     @Override
